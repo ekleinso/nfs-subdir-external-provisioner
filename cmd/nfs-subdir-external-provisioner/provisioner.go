@@ -36,6 +36,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	storagehelpers "k8s.io/component-helpers/storage/volume"
+	"k8s.io/klog"
 	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 )
 
@@ -124,7 +125,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	scGroup, ok := options.StorageClass.Annotations["fs.group"]
 	if ok {
 		if gid, err := strconv.Atoi(scGroup); err == nil {
-			glog.V(1).Infof("setting group using StorageClass annotation %s", scGroup)
+			klog.Infof("setting group using StorageClass annotation %s", scGroup)
 			os.Chown(fullPath, -1, gid)
 		}
 	}
@@ -132,7 +133,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	scOwner, ok := options.StorageClass.Annotations["fs.owner"]
 	if ok {
 		if uid, err := strconv.Atoi(scOwner); err == nil {
-			glog.V(1).Infof("setting owner using StorageClass annotation %s", scOwner)
+			klog.Infof("setting owner using StorageClass annotation %s", scOwner)
 			os.Chown(fullPath, uid, -1)
 		}
 	}
@@ -140,7 +141,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	scPermissions, ok := options.StorageClass.Annotations["fs.permissions"]
 	if ok {
 		if perms, err := strconv.ParseInt(scPermissions, 8, 0); err == nil {
-			glog.V(1).Infof("setting permissions using StorageClass annotation %s - %o", scPermissions, perms)
+			klog.Infof("setting permissions using StorageClass annotation %s - %o", scPermissions, perms)
 			os.Chmod(fullPath, os.FileMode(perms))
 		}
 	}
@@ -149,7 +150,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	fsGroup, ok := options.PVC.Annotations["fs.group"]
 	if ok {
 		if gid, err := strconv.Atoi(fsGroup); err == nil {
-			glog.V(1).Infof("setting group using PVC annotation %s", fsGroup)
+			klog.Infof("setting group using PVC annotation %s", fsGroup)
 			os.Chown(fullPath, -1, gid)
 		}
 	}
@@ -157,7 +158,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	fsOwner, ok := options.PVC.Annotations["fs.owner"]
 	if ok {
 		if uid, err := strconv.Atoi(fsOwner); err == nil {
-			glog.V(1).Infof("setting owner using PVC annotation %s", fsOwner)
+			klog.Infof("setting owner using PVC annotation %s", fsOwner)
 			os.Chown(fullPath, uid, -1)
 		}
 	}
@@ -165,7 +166,7 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	fsPermissions, ok := options.PVC.Annotations["fs.permissions"]
 	if ok {
 		if perms, err := strconv.ParseInt(fsPermissions, 8, 0); err == nil {
-			glog.V(1).Infof("setting permissions using PVC annotation %s - %o", fsPermissions, perms)
+			klog.Infof("setting permissions using PVC annotation %s - %o", fsPermissions, perms)
 			os.Chmod(fullPath, os.FileMode(perms))
 		}
 	}
