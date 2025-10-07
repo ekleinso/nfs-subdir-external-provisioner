@@ -120,6 +120,50 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 		return nil, "", err
 	}
 
+	/* EMK - Added to enable StorageClass based configurations for permissions and groups */
+	scGroup, ok := options.StorageClass.Annotations["fs.group"]
+	if ok {
+			if gid, err := strconv.Atoi(scGroup); err == nil {
+					os.Chown(fullPath, -1, gid)
+			}
+	}
+
+	scOwner, ok := options.StorageClass.Annotations["fs.owner"]
+	if ok {
+			if uid, err := strconv.Atoi(scOwner); err == nil {
+					os.Chown(fullPath, uid, -1)
+			}
+	}
+
+	scPermissions, ok := options.StorageClass.Annotations["fs.permissions"]
+	if ok {
+			if perms, err := strconv.ParseInt(scPermissions, 8, 0); err == nil {
+					os.Chmod(fullPath, os.FileMode(perms))
+			}
+	}
+
+	/* EMK - Added to enable PVC based configurations for permissions and groups */
+	fsGroup, ok := options.PVC.Annotations["fs.group"]
+	if ok {
+			if gid, err := strconv.Atoi(fsGroup); err == nil {
+					os.Chown(fullPath, -1, gid)
+			}
+	}
+
+	fsOwner, ok := options.PVC.Annotations["fs.owner"]
+	if ok {
+			if uid, err := strconv.Atoi(fsOwner); err == nil {
+					os.Chown(fullPath, uid, -1)
+			}
+	}
+
+	fsPermissions, ok := options.PVC.Annotations["fs.permissions"]
+	if ok {
+			if perms, err := strconv.ParseInt(fsPermissions, 8, 0); err == nil {
+					os.Chmod(fullPath, os.FileMode(perms))
+			}
+	}
+
 	pv := &v1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: options.PVName,
