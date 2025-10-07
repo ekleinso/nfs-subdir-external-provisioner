@@ -123,45 +123,51 @@ func (p *nfsProvisioner) Provision(ctx context.Context, options controller.Provi
 	/* EMK - Added to enable StorageClass based configurations for permissions and groups */
 	scGroup, ok := options.StorageClass.Annotations["fs.group"]
 	if ok {
-			if gid, err := strconv.Atoi(scGroup); err == nil {
-					os.Chown(fullPath, -1, gid)
-			}
+		if gid, err := strconv.Atoi(scGroup); err == nil {
+			glog.V(1).Infof("setting group using StorageClass annotation %s", scGroup)
+			os.Chown(fullPath, -1, gid)
+		}
 	}
 
 	scOwner, ok := options.StorageClass.Annotations["fs.owner"]
 	if ok {
-			if uid, err := strconv.Atoi(scOwner); err == nil {
-					os.Chown(fullPath, uid, -1)
-			}
+		if uid, err := strconv.Atoi(scOwner); err == nil {
+			glog.V(1).Infof("setting owner using StorageClass annotation %s", scOwner)
+			os.Chown(fullPath, uid, -1)
+		}
 	}
 
 	scPermissions, ok := options.StorageClass.Annotations["fs.permissions"]
 	if ok {
-			if perms, err := strconv.ParseInt(scPermissions, 8, 0); err == nil {
-					os.Chmod(fullPath, os.FileMode(perms))
-			}
+		if perms, err := strconv.ParseInt(scPermissions, 8, 0); err == nil {
+			glog.V(1).Infof("setting permissions using StorageClass annotation %s - %o", scPermissions, perms)
+			os.Chmod(fullPath, os.FileMode(perms))
+		}
 	}
 
 	/* EMK - Added to enable PVC based configurations for permissions and groups */
 	fsGroup, ok := options.PVC.Annotations["fs.group"]
 	if ok {
-			if gid, err := strconv.Atoi(fsGroup); err == nil {
-					os.Chown(fullPath, -1, gid)
-			}
+		if gid, err := strconv.Atoi(fsGroup); err == nil {
+			glog.V(1).Infof("setting group using PVC annotation %s", fsGroup)
+			os.Chown(fullPath, -1, gid)
+		}
 	}
 
 	fsOwner, ok := options.PVC.Annotations["fs.owner"]
 	if ok {
-			if uid, err := strconv.Atoi(fsOwner); err == nil {
-					os.Chown(fullPath, uid, -1)
-			}
+		if uid, err := strconv.Atoi(fsOwner); err == nil {
+			glog.V(1).Infof("setting owner using PVC annotation %s", fsOwner)
+			os.Chown(fullPath, uid, -1)
+		}
 	}
 
 	fsPermissions, ok := options.PVC.Annotations["fs.permissions"]
 	if ok {
-			if perms, err := strconv.ParseInt(fsPermissions, 8, 0); err == nil {
-					os.Chmod(fullPath, os.FileMode(perms))
-			}
+		if perms, err := strconv.ParseInt(fsPermissions, 8, 0); err == nil {
+			glog.V(1).Infof("setting permissions using PVC annotation %s - %o", fsPermissions, perms)
+			os.Chmod(fullPath, os.FileMode(perms))
+		}
 	}
 
 	pv := &v1.PersistentVolume{
